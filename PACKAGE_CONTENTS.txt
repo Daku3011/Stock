@@ -1,0 +1,64 @@
+📦 STOCK ANALYSIS DASHBOARD - COMPLETE PACKAGE
+===============================================
+
+✅ CORE APPLICATION FILES:
+  ├── app.py                 - Main Flask web application (MAIN FILE)
+  ├── start.py              - Universal cross-platform launcher
+  ├── setup.py              - Automatic setup script
+  └── requirements.txt      - Python package dependencies
+
+✅ LAUNCHER SCRIPTS:
+  ├── run.sh               - Linux/macOS launcher (auto-configures)
+  └── run.bat              - Windows launcher (auto-configures)
+
+✅ DOCUMENTATION:
+  ├── README.md            - Quick reference guide
+  ├── INSTALLATION.md      - Detailed installation instructions
+  ├── GETTING_STARTED.md   - Complete overview & usage
+  └── .env.example         - Configuration template
+
+✅ LEGACY/SUPPORT:
+  ├── web_dashboard.py     - Previous version (optional)
+  ├── test.py              - Test file
+  ├── vader_lexicon.txt    - Sentiment analysis data
+  └── [venv/]              - Virtual environment (auto-created)
+
+===============================================
+
+🚀 QUICK START:
+  
+  Option 1 (Universal):
+    python3 start.py
+  
+  Option 2 (Windows):
+    python setup.py
+    run.bat
+  
+  Option 3 (Linux/macOS):
+    python3 setup.py
+    ./run.sh
+
+📍 ACCESS:
+  Local:      http://127.0.0.1:5000
+  Network:    http://<your-ip>:5000
+
+📊 FEATURES:
+  ✓ Real-time stock data (Yahoo Finance)
+  ✓ Web-based stock selection
+  ✓ Interactive Plotly charts
+  ✓ AI/ML price predictions
+  ✓ News sentiment analysis
+  ✓ Network-accessible dashboard
+  ✓ Cross-platform (Windows/Mac/Linux)
+  ✓ Zero configuration setup
+
+🌟 SUPPORTED STOCKS (15 common):
+  TCS, INFY, WIPRO, HCLTECH, RELIANCE, HDFC,
+  SBIN, ICICIBANK, BAJAJFINSV, ADANIPORTS,
+  MARUTI, COAL, NTPC, POWERGRID, IRB
+
+  + Any custom NSE/BSE stock symbol!
+
+===============================================
+
+For more information, see: README.md or GETTING_STARTED.md
