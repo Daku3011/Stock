@@ -55,16 +55,10 @@ MAX_RETRIES = 3
 
 def fetch_stock_data(symbol, retries=MAX_RETRIES):
     """Fetch stock data with retry logic for reliability"""
-    import requests
-    session = requests.Session()
-    session.headers.update({
-        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36"
-    })
-    
     for attempt in range(retries):
         try:
             print(f"📥 Fetching data for {symbol} (attempt {attempt + 1}/{retries})...")
-            df = yf.download(symbol, period='1y', interval='1d', progress=False, session=session)
+            df = yf.download(symbol, period='1y', interval='1d', progress=False)
             
             if df is None or df.empty:
                 if attempt < retries - 1:
@@ -85,15 +79,56 @@ def fetch_stock_data(symbol, retries=MAX_RETRIES):
     print(f"❌ Failed to fetch data after {retries} attempts")
     return None
 
+def get_ticker_from_name(query):
+    """Dynamically find ticker from company name using Yahoo API"""
+    query = str(query).strip()
+    
+    # If it's likely already a ticker (no spaces, mostly uppercase)
+    if " " not in query and sum(1 for c in query if c.isupper()) > len(query) / 2:
+        if not (query.endswith('.NS') or query.endswith('.BO')):
+            return query.upper() + ".NS"
+        return query.upper()
+        
+    url = f"https://query2.finance.yahoo.com/v1/finance/search?q={query}"
+    session = requests.Session()
+    session.headers.update({
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"
+    })
+    
+    try:
+        response = session.get(url, timeout=5)
+        if response.status_code == 200:
+            data = response.json()
+            quotes = data.get('quotes', [])
+            
+            # Look for NSE or BSE matches
+            for quote in quotes:
+                symbol = quote.get('symbol', '')
+                exchange = quote.get('exchange', '')
+                if exchange in ['NSI', 'BSE'] or symbol.endswith('.NS') or symbol.endswith('.BO'):
+                    return symbol
+                    
+            if quotes:
+                return quotes[0].get('symbol', '')
+                
+    except Exception as e:
+        print(f"⚠️ Search error for {query}: {e}")
+        
+    # Fallback to the original dumb behavior if API fails
+    fallback = query.replace(" ", "").upper()
+    if not (fallback.endswith('.NS') or fallback.endswith('.BO')):
+        return fallback + ".NS"
+    return fallback
+
 
 def generate_dashboard(symbol):
     """Generate stock dashboard for given symbol"""
     
-    # 1. AUTO-FIX TICKER (Add .NS for India)
-    if not (symbol.endswith('.NS') or symbol.endswith('.BO')):
-        symbol = symbol + ".NS"
+    # 1. AUTO-FIX TICKER (Use new search API)
+    original_query = symbol
+    symbol = get_ticker_from_name(symbol)
     
-    print(f"--- 🚀 ANALYZING: {symbol} ---")
+    print(f"--- 🚀 ANALYZING: {symbol} (from '{original_query}') ---")
 
     try:
         # --- PART 1: FETCH DATA with RETRIES ---
@@ -301,7 +336,7 @@ hr{{border: 1px solid #444; width: 50%;}}
 @app.route('/')
 def dashboard():
     """Main dashboard route"""
-    symbol = request.args.get('symbol', DEFAULT_STOCK).upper().strip()
+    symbol = request.args.get('symbol', DEFAULT_STOCK).strip()
     
     if not symbol:
         symbol = DEFAULT_STOCK
